@@ -1,0 +1,36 @@
+﻿<Project Sdk="Microsoft.NET.Sdk.Web">
+
+  <PropertyGroup>
+    <TargetFramework>netcoreapp2.1</TargetFramework>
+    <LangVersion>latest</LangVersion>
+    <TypeScriptToolsVersion>latest</TypeScriptToolsVersion>
+  </PropertyGroup>
+
+  <PropertyGroup>
+    <AssetTargetFallback>$(AssetTargetFallback);portable-net45+win8+wp8+wpa81;</AssetTargetFallback>
+  </PropertyGroup>
+
+  <PropertyGroup>
+    <CodeAnalysisRuleSet>..\..\Rules.ruleset</CodeAnalysisRuleSet>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <AdditionalFiles Include="..\..\stylecop.json" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.AspNetCore.All" Version="2.1.5" />
+    <PackageReference Include="StyleCop.Analyzers" Version="1.1.0-beta009" PrivateAssets="All" />
+  </ItemGroup>
+  <ItemGroup>
+    <DotNetCliToolReference Include="Microsoft.VisualStudio.Web.CodeGeneration.Tools" Version="2.0.1" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\Data\LoveAdvisor.Data.Models\LoveAdvisor.Data.Models.csproj" />
+    <ProjectReference Include="..\..\Data\LoveAdvisor.Data\LoveAdvisor.Data.csproj" />
+    <ProjectReference Include="..\..\Services\LoveAdvisor.Services.Messaging\LoveAdvisor.Services.Messaging.csproj" />
+    <ProjectReference Include="..\..\Services\LoveAdvisor.Services\LoveAdvisor.Services.csproj" />
+    <ProjectReference Include="..\LoveAdvisor.Web.Infrastructure\LoveAdvisor.Web.Infrastructure.csproj" />
+  </ItemGroup>
+  
+</Project>
