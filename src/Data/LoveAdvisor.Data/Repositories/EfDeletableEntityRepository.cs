@@ -25,35 +25,18 @@
 
         public IQueryable<TEntity> AllAsNoTrackingWithDeleted() => base.AllAsNoTracking().IgnoreQueryFilters();
 
-        public override async Task<TEntity> GetByIdAsync(params object[] id)
-        {
-            var entity = await base.GetByIdAsync(id);
-
-            if (entity?.IsDeleted ?? false)
-            {
-                entity = null;
-            }
-
-            return entity;
-        }
-
         public Task<TEntity> GetByIdWithDeletedAsync(params object[] id)
         {
-            var byIdPredicate = EfExpressionHelper.BuildByIdPredicate<TEntity>(this.Context, id);
-
-            return this.AllWithDeleted().FirstOrDefaultAsync(byIdPredicate);
+            var getByIdPredicate = EfExpressionHelper.BuildByIdPredicate<TEntity>(this.Context, id);
+            return this.AllWithDeleted().FirstOrDefaultAsync(getByIdPredicate);
         }
 
-        public void HardDelete(TEntity entity)
-        {
-            base.Delete(entity);
-        }
+        public void HardDelete(TEntity entity) => base.Delete(entity);
 
         public void Undelete(TEntity entity)
         {
             entity.IsDeleted = false;
             entity.DeletedOn = null;
-
             this.Update(entity);
         }
 
@@ -61,7 +44,6 @@
         {
             entity.IsDeleted = true;
             entity.DeletedOn = DateTime.UtcNow;
-
             this.Update(entity);
         }
     }

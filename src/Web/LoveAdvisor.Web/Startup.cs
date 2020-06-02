@@ -1,39 +1,26 @@
 ﻿namespace LoveAdvisor.Web
 {
-    using System;
-    using System.Linq;
-    using System.Net;
     using System.Reflection;
-    using System.Security.Claims;
-    using System.Security.Principal;
-    using System.Text;
-    using System.Threading.Tasks;
 
-    using LoveAdvisor.Common;
-    using LoveAdvisor.Common.Mapping;
     using LoveAdvisor.Data;
+    using LoveAdvisor.Data.Common;
     using LoveAdvisor.Data.Common.Repositories;
     using LoveAdvisor.Data.Models;
     using LoveAdvisor.Data.Repositories;
     using LoveAdvisor.Data.Seeding;
+    using LoveAdvisor.Services.Data;
+    using LoveAdvisor.Services.Mapping;
     using LoveAdvisor.Services.Messaging;
-    using LoveAdvisor.Web.Infrastructure.Middlewares.Auth;
-    using LoveAdvisor.Web.ViewModels.TodoItems;
+    using LoveAdvisor.Web.ViewModels;
 
     using Microsoft.AspNetCore.Builder;
-    using Microsoft.AspNetCore.Diagnostics;
     using Microsoft.AspNetCore.Hosting;
     using Microsoft.AspNetCore.Http;
-    using Microsoft.AspNetCore.Identity;
     using Microsoft.AspNetCore.Mvc;
     using Microsoft.EntityFrameworkCore;
     using Microsoft.Extensions.Configuration;
     using Microsoft.Extensions.DependencyInjection;
-    using Microsoft.Extensions.Logging;
-    using Microsoft.Extensions.Options;
-    using Microsoft.IdentityModel.Tokens;
-
-    using Newtonsoft.Json;
+    using Microsoft.Extensions.Hosting;
 
     public class Startup
     {
@@ -47,141 +34,78 @@
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
-            // Framework services
-            // TODO: Add pooling when this bug is fixed: https://github.com/aspnet/EntityFrameworkCore/issues/9741
             services.AddDbContext<ApplicationDbContext>(
                 options => options.UseSqlServer(this.configuration.GetConnectionString("DefaultConnection")));
 
-            var signingKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(this.configuration["JwtTokenValidation:Secret"]));
+            services.AddDefaultIdentity<ApplicationUser>(IdentityOptionsProvider.GetIdentityOptions)
+                .AddRoles<ApplicationRole>().AddEntityFrameworkStores<ApplicationDbContext>();
 
-            services.Configure<TokenProviderOptions>(opts =>
-            {
-                opts.Audience = this.configuration["JwtTokenValidation:Audience"];
-                opts.Issuer = this.configuration["JwtTokenValidation:Issuer"];
-                opts.Path = "/api/account/login";
-                opts.Expiration = TimeSpan.FromDays(15);
-                opts.SigningCredentials = new SigningCredentials(signingKey, SecurityAlgorithms.HmacSha256);
-            });
-
-            services
-                .AddAuthentication()
-                .AddJwtBearer(opts =>
-                {
-                    opts.TokenValidationParameters = new TokenValidationParameters
+            services.Configure<CookiePolicyOptions>(
+                options =>
                     {
-                        ValidateIssuerSigningKey = true,
-                        IssuerSigningKey = signingKey,
-                        ValidateIssuer = true,
-                        ValidIssuer = this.configuration["JwtTokenValidation:Issuer"],
-                        ValidateAudience = true,
-                        ValidAudience = this.configuration["JwtTokenValidation:Audience"],
-                        ValidateLifetime = true,
-                    };
-                });
+                        options.CheckConsentNeeded = context => true;
+                        options.MinimumSameSitePolicy = SameSiteMode.None;
+                    });
 
-            services
-                .AddIdentity<ApplicationUser, ApplicationRole>(options =>
-                {
-                    options.Password.RequiredLength = 6;
-                    options.Password.RequireDigit = false;
-                    options.Password.RequireLowercase = false;
-                    options.Password.RequireNonAlphanumeric = false;
-                    options.Password.RequireUppercase = false;
-                })
-                .AddEntityFrameworkStores<ApplicationDbContext>()
-                .AddUserStore<ApplicationUserStore>()
-                .AddRoleStore<ApplicationRoleStore>()
-                .AddDefaultTokenProviders();
-
-            services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_1);
+            services.AddControllersWithViews(
+                options =>
+                    {
+                        options.Filters.Add(new AutoValidateAntiforgeryTokenAttribute());
+                    });
+            services.AddRazorPages();
 
             services.AddSingleton(this.configuration);
 
             // Data repositories
             services.AddScoped(typeof(IDeletableEntityRepository<>), typeof(EfDeletableEntityRepository<>));
             services.AddScoped(typeof(IRepository<>), typeof(EfRepository<>));
+            services.AddScoped<IDbQueryRunner, DbQueryRunner>();
 
             // Application services
             services.AddTransient<IEmailSender, NullMessageSender>();
-            services.AddTransient<ISmsSender, NullMessageSender>();
-
-            // Identity stores
-            services.AddTransient<IUserStore<ApplicationUser>, ApplicationUserStore>();
-            services.AddTransient<IRoleStore<ApplicationRole>, ApplicationRoleStore>();
+            services.AddTransient<ISettingsService, SettingsService>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
-        public void Configure(IApplicationBuilder app, IHostingEnvironment env, ILoggerFactory loggerFactory)
+        public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
         {
-            AutoMapperConfig.RegisterMappings(typeof(TodoItemViewModel).GetTypeInfo().Assembly);
+            AutoMapperConfig.RegisterMappings(typeof(ErrorViewModel).GetTypeInfo().Assembly);
 
             // Seed data on application startup
             using (var serviceScope = app.ApplicationServices.CreateScope())
             {
                 var dbContext = serviceScope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
-
-                if (env.IsDevelopment())
-                {
-                    dbContext.Database.Migrate();
-                }
-
-                ApplicationDbContextSeeder.Seed(dbContext, serviceScope.ServiceProvider);
+                dbContext.Database.Migrate();
+                new ApplicationDbContextSeeder().SeedAsync(dbContext, serviceScope.ServiceProvider).GetAwaiter().GetResult();
             }
 
             if (env.IsDevelopment())
             {
-                app.UseExceptionHandler(application =>
-                {
-                    application.Run(async context =>
+                app.UseDeveloperExceptionPage();
+                app.UseDatabaseErrorPage();
+            }
+            else
+            {
+                app.UseExceptionHandler("/Home/Error");
+                app.UseHsts();
+            }
+
+            app.UseHttpsRedirection();
+            app.UseStaticFiles();
+            app.UseCookiePolicy();
+
+            app.UseRouting();
+
+            app.UseAuthentication();
+            app.UseAuthorization();
+
+            app.UseEndpoints(
+                endpoints =>
                     {
-                        context.Response.StatusCode = (int)HttpStatusCode.InternalServerError;
-                        context.Response.ContentType = GlobalConstants.JsonContentType;
-
-                        var ex = context.Features.Get<IExceptionHandlerFeature>();
-                        if (ex != null)
-                        {
-                            await context.Response
-                                .WriteAsync(JsonConvert.SerializeObject(new { ex.Error?.Message, ex.Error?.StackTrace }))
-                                .ConfigureAwait(continueOnCapturedContext: false);
-                        }
+                        endpoints.MapControllerRoute("areaRoute", "{area:exists}/{controller=Home}/{action=Index}/{id?}");
+                        endpoints.MapControllerRoute("default", "{controller=Home}/{action=Index}/{id?}");
+                        endpoints.MapRazorPages();
                     });
-                });
-            }
-
-            app.UseFileServer();
-
-            app.UseJwtBearerTokens(
-                app.ApplicationServices.GetRequiredService<IOptions<TokenProviderOptions>>(),
-                PrincipalResolver);
-
-            app.UseMvc(routes => routes.MapRoute("default", "api/{controller}/{action}/{id?}"));
-        }
-
-        private static async Task<GenericPrincipal> PrincipalResolver(HttpContext context)
-        {
-            var email = context.Request.Form["email"];
-
-            var userManager = context.RequestServices.GetRequiredService<UserManager<ApplicationUser>>();
-            var user = await userManager.FindByEmailAsync(email);
-            if (user == null || user.IsDeleted)
-            {
-                return null;
-            }
-
-            var password = context.Request.Form["password"];
-
-            var isValidPassword = await userManager.CheckPasswordAsync(user, password);
-            if (!isValidPassword)
-            {
-                return null;
-            }
-
-            var roles = await userManager.GetRolesAsync(user);
-
-            var identity = new GenericIdentity(email, "Token");
-            identity.AddClaim(new Claim(ClaimTypes.NameIdentifier, user.Id));
-
-            return new GenericPrincipal(identity, roles.ToArray());
         }
     }
 }

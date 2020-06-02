@@ -1,6 +1,7 @@
 ﻿namespace LoveAdvisor.Data
 {
     using System;
+    using System.Threading.Tasks;
 
     using LoveAdvisor.Data.Common;
 
@@ -15,14 +16,23 @@
 
         public ApplicationDbContext Context { get; set; }
 
-        public void RunQuery(string query, params object[] parameters)
+        public Task RunQueryAsync(string query, params object[] parameters)
         {
-            this.Context.Database.ExecuteSqlCommand(query, parameters);
+            return this.Context.Database.ExecuteSqlRawAsync(query, parameters);
         }
 
         public void Dispose()
         {
-            this.Context?.Dispose();
+            this.Dispose(true);
+            GC.SuppressFinalize(this);
+        }
+
+        protected virtual void Dispose(bool disposing)
+        {
+            if (disposing)
+            {
+                this.Context?.Dispose();
+            }
         }
     }
 }

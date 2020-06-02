@@ -1,36 +1,37 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk.Web">
 
   <PropertyGroup>
-    <TargetFramework>netcoreapp2.1</TargetFramework>
+    <TargetFramework>netcoreapp3.1</TargetFramework>
+    <UserSecretsId>aspnet-LoveAdvisor-BBB373B5-EF3F-4DBB-B8AA-7152CEC275BF</UserSecretsId>
     <LangVersion>latest</LangVersion>
-    <TypeScriptToolsVersion>latest</TypeScriptToolsVersion>
-  </PropertyGroup>
-
-  <PropertyGroup>
-    <AssetTargetFallback>$(AssetTargetFallback);portable-net45+win8+wp8+wpa81;</AssetTargetFallback>
   </PropertyGroup>
 
   <PropertyGroup>
     <CodeAnalysisRuleSet>..\..\Rules.ruleset</CodeAnalysisRuleSet>
   </PropertyGroup>
-
   <ItemGroup>
     <AdditionalFiles Include="..\..\stylecop.json" />
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="Microsoft.AspNetCore.All" Version="2.1.5" />
-    <PackageReference Include="StyleCop.Analyzers" Version="1.1.0-beta009" PrivateAssets="All" />
+    <PackageReference Include="Microsoft.VisualStudio.Web.CodeGeneration.Design" Version="3.1.2" />
+    <PackageReference Include="BuildBundlerMinifier" Version="3.2.447" />
+    <PackageReference Include="Microsoft.Web.LibraryManager.Build" Version="2.0.96" />
+    <PackageReference Include="Microsoft.AspNetCore.Diagnostics.EntityFrameworkCore" Version="3.1.3" />
+    <PackageReference Include="Microsoft.AspNetCore.Identity.UI" Version="3.1.3" />
+    <PackageReference Include="StyleCop.Analyzers" Version="1.2.0-beta.164" PrivateAssets="all">
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers</IncludeAssets>
+    </PackageReference>
   </ItemGroup>
-  <ItemGroup>
-    <DotNetCliToolReference Include="Microsoft.VisualStudio.Web.CodeGeneration.Tools" Version="2.0.1" />
-  </ItemGroup>
+
   <ItemGroup>
     <ProjectReference Include="..\..\Data\LoveAdvisor.Data.Models\LoveAdvisor.Data.Models.csproj" />
     <ProjectReference Include="..\..\Data\LoveAdvisor.Data\LoveAdvisor.Data.csproj" />
+    <ProjectReference Include="..\..\Services\LoveAdvisor.Services.Data\LoveAdvisor.Services.Data.csproj" />
+    <ProjectReference Include="..\..\Services\LoveAdvisor.Services.Mapping\LoveAdvisor.Services.Mapping.csproj" />
     <ProjectReference Include="..\..\Services\LoveAdvisor.Services.Messaging\LoveAdvisor.Services.Messaging.csproj" />
     <ProjectReference Include="..\..\Services\LoveAdvisor.Services\LoveAdvisor.Services.csproj" />
     <ProjectReference Include="..\LoveAdvisor.Web.Infrastructure\LoveAdvisor.Web.Infrastructure.csproj" />
+    <ProjectReference Include="..\LoveAdvisor.Web.ViewModels\LoveAdvisor.Web.ViewModels.csproj" />
   </ItemGroup>
-  
 </Project>

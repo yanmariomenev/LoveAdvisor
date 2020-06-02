@@ -2,8 +2,8 @@
 {
     public static class GlobalConstants
     {
-        public const string AdministratorRoleName = "Administrator";
+        public const string SystemName = "LoveAdvisor";
 
-        public const string JsonContentType = "application/json";
+        public const string AdministratorRoleName = "Administrator";
     }
 }
