@@ -47,6 +47,12 @@
                         options.MinimumSameSitePolicy = SameSiteMode.None;
                     });
 
+            // AntiforgeryToken
+            services.AddControllersWithViews(configure =>
+            {
+                configure.Filters.Add(new AutoValidateAntiforgeryTokenAttribute());
+            });
+
             services.AddControllersWithViews(
                 options =>
                     {
@@ -90,6 +96,7 @@
                 app.UseHsts();
             }
 
+            app.UseResponseCompression();
             app.UseHttpsRedirection();
             app.UseStaticFiles();
             app.UseCookiePolicy();
