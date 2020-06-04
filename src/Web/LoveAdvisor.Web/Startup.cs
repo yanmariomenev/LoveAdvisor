@@ -59,8 +59,8 @@
                         options.Filters.Add(new AutoValidateAntiforgeryTokenAttribute());
                     });
             services.AddRazorPages();
-
             services.AddSingleton(this.configuration);
+            services.AddResponseCompression(options => { options.EnableForHttps = true; });
 
             // Data repositories
             services.AddScoped(typeof(IDeletableEntityRepository<>), typeof(EfDeletableEntityRepository<>));

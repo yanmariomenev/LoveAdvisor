@@ -39,12 +39,12 @@
             <h1 id="colorlib-logo"><a href="index.html">elen<span>.</span></a></h1>
             <nav id="colorlib-main-menu" role="navigation">
                 <ul>
-                    <li class="colorlib-active"><a href="index.html">Home</a></li>
-                    <li><a href="photography.html">Placeholder1</a></li>
-                    <li><a href="travel.html">Placeholder2</a></li>
-                    <li><a href="fashion.html">Placeholder3</a></li>
-                    <li><a href="about.html">About</a></li>
-                    <li><a href="contact.html">Contact</a></li>
+                    <li class="colorlib-active"><a asp-area="" asp-controller="Home" asp-action="Index">Home</a></li>
+                    <li><a asp-area="" asp-controller="Tips" asp-action="Dating">Dating</a></li>
+                    <li><a asp-area="" asp-controller="Tips" asp-action="Conversation">Conversation Starters</a></li>
+                    <li><a asp-area="" asp-controller="Tips" asp-action="Tinder">Tinder Tips</a></li>
+                    @*<li><a href="about.html">About</a></li>*@
+                    <li><a asp-area="" asp-controller="Home" asp-action="Contact">Contact</a></li>
                 </ul>
             </nav>
 
