@@ -9,6 +9,7 @@
     using LoveAdvisor.Data.Repositories;
     using LoveAdvisor.Data.Seeding;
     using LoveAdvisor.Services.Data;
+    using LoveAdvisor.Services.Data.TipService;
     using LoveAdvisor.Services.Mapping;
     using LoveAdvisor.Services.Messaging;
     using LoveAdvisor.Web.ViewModels;
@@ -69,7 +70,7 @@
 
             // Application services
             services.AddTransient<IEmailSender, NullMessageSender>();
-            services.AddTransient<ISettingsService, SettingsService>();
+            services.AddTransient<ITipService, TipService>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
