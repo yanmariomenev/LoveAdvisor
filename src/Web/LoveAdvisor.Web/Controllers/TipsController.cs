@@ -1,11 +1,13 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Mvc;
-
-namespace LoveAdvisor.Web.Controllers
+﻿namespace LoveAdvisor.Web.Controllers
 {
+    using System;
+    using System.Collections.Generic;
+    using System.Linq;
+    using System.Threading.Tasks;
+
+    using Microsoft.AspNetCore.Authorization;
+    using Microsoft.AspNetCore.Mvc;
+
     public class TipsController : BaseController
     {
         public IActionResult Conversation()
@@ -23,6 +25,7 @@ namespace LoveAdvisor.Web.Controllers
             return this.View();
         }
 
+        [Authorize]
         public IActionResult Create()
         {
             return this.View();
