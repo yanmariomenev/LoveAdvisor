@@ -45,6 +45,10 @@
                     <li><a asp-area="" asp-controller="Tips" asp-action="Tinder">Tinder Tips</a></li>
                     @*<li><a href="about.html">About</a></li>*@
                     <li><a asp-area="" asp-controller="Home" asp-action="Contact">Contact</a></li>
+                    @if (User.IsInRole("Moderator"))
+                    {
+                        <li><a asp-area="" asp-controller="Tips" asp-action="Create">Create Tip</a></li>
+                    }
                     <li> <partial name="_LoginPartial" /></li>
                 </ul>
             </nav>
@@ -61,30 +65,7 @@
                         <li><a href="#"><i class="icon-linkedin"></i></a></li>
                     </ul>
             </div>
-        </aside> <!-- END COLORLIB-ASIDE -->
-        @*<nav class="navbar navbar-expand-sm navbar-light bg-white border-bottom box-shadow mb-3">
-                <div class="container">
-                    <a class="navbar-brand" asp-area="" asp-controller="Home" asp-action="Index">@GlobalConstants.SystemName</a>
-                    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target=".navbar-collapse" aria-controls="navbarSupportedContent"
-                            aria-expanded="false" aria-label="Toggle navigation">
-                        <span class="navbar-toggler-icon"></span>
-                    </button>
-                    <div class="navbar-collapse collapse d-sm-inline-flex flex-sm-row-reverse">
-                        <partial name="_LoginPartial" />
-                        <ul class="navbar-nav flex-grow-1">
-                            <li class="nav-item">
-                                <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Index">Home</a>
-                            </li>
-                            <li class="nav-item">
-                                <a class="nav-link text-dark" asp-area="" asp-controller="Settings" asp-action="Index">Settings</a>
-                            </li>
-                            <li class="nav-item">
-                                <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
-                            </li>
-                        </ul>
-                    </div>
-                </div>
-            </nav>*@
+        </aside> 
     </header>
 
     <div id="colorlib-page">
