@@ -22,34 +22,14 @@
             this.tipRepo = tipRepo;
         }
 
-        public async Task<IEnumerable<T>> TakeConversationTips<T>()
+        public async Task<IEnumerable<T>> TakeTipsByCategory<T>(string category)
         {
             var conversationList = this.categoryRepo
                 .All()
-                .Where(x => x.Name == "Conversation")
+                .Where(x => x.Name == category)
                 .Select(x => x.Tips).Take(12);
 
             return await conversationList.To<T>().ToListAsync();
-        }
-
-        public async Task<IEnumerable<T>> TakeDatingTips<T>()
-        {
-            var tinderList = this.categoryRepo
-               .All()
-               .Where(x => x.Name == "Tinder")
-               .Select(x => x.Tips).Take(12);
-
-            return await tinderList.To<T>().ToListAsync();
-        }
-
-        public async Task<IEnumerable<T>> TakeTinderTips<T>()
-        {
-            var datingList = this.categoryRepo
-               .All()
-               .Where(x => x.Name == "Dating")
-               .Select(x => x.Tips).Take(12);
-
-            return await datingList.To<T>().ToListAsync();
         }
     }
 }

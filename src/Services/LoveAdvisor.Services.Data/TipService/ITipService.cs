@@ -5,10 +5,6 @@
 
     public interface ITipService
     {
-        Task<IEnumerable<T>> TakeTinderTips<T>();
-
-        Task<IEnumerable<T>> TakeDatingTips<T>();
-
-        Task<IEnumerable<T>> TakeConversationTips<T>();
+        Task<IEnumerable<T>> TakeTipsByCategory<T>(string category);
     }
 }
