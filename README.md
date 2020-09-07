@@ -1,5 +1,5 @@
 # LoveAdvisor
-Project is back on the menu. Might redesign some things and hopefully will be kinda ready in a week.
+Project is back on the bench for now.
 General ideas: 
 *On click get a random tip/idea.
 *Conversation mini-game starter.
